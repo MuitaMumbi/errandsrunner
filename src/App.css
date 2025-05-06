@@ -36,3 +36,214 @@
     transform: rotate(360deg);
   }
 }
+
+#home {
+  background-image: url(/public/images/grocery.jpeg);
+  background-size: cover;
+  position: relative;
+  min-height: 100%;
+  
+}
+
+#dash {
+  background-image: url(/public/images/dashimage4.jpg);
+  opacity: calc();
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+#head {
+  font-size: 30px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-weight: 500;
+  font-style:oblique;
+  color:#0056b3;
+}
+
+#empty {
+  position: absolute;
+  min-height: 100%;
+  background-color: black;
+  opacity: 0.5;
+  z-index: -10;
+}
+.home-container {
+  min-height: 100vh;
+  background: url(../public/images/Errand-Running-1.jpg);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero-section {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: white;
+  
+}
+
+.content-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.welcome-text {
+  font-size: 1.5rem;
+  /* margin-botto/m: 0.5rem; */
+  color: white;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 800;
+  /* margin: 1rem 0; */
+  background: linear-gradient(to right, white, white);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.tagline {
+  font-size: 1.8rem;
+  margin: 2rem 0;
+  color: white;
+}
+
+.icon-container {
+  margin: 2rem 0;
+}
+
+.home-icon {
+  height: 150px;
+  width: auto;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+  transition: transform 0.3s ease;
+}
+
+.home-icon:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.btn {
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-outline-primary {
+  border-color: #3498db;
+  color: #3498db;
+}
+
+.btn-outline-primary:hover {
+  background-color: #3498db;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.features-section {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 3rem 2rem;
+  background-color: white;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+  margin-top: 3rem;
+}
+
+.feature-card {
+  flex: 1;
+  min-width: 250px;
+  max-width: 300px;
+  padding: 2rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  color: #3498db;
+  margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.feature-card p {
+  color: #7f8c8d;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .title {
+      font-size: 2.5rem;
+  }
+  
+  .tagline {
+      font-size: 1.3rem;
+  }
+  
+  .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+  }
+  
+  .features-section {
+      flex-direction: column;
+      align-items: center;
+  }
+}
+
+/* Optional CSS for additional styling */
+.card {
+  border-radius: 8px;
+}
+
+.card .form-control {
+  border-radius: 5px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card .btn-primary {
+  border-radius: 5px;
+  background-color: #007bff;
+  border: none;
+  padding: 12px;
+}
+
+.card .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+iframe {
+  border-radius: 8px;
+}
