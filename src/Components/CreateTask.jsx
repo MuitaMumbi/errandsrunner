@@ -5,24 +5,28 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const CreateTask = () => {
-    const [formData, setFormData] = useState({
-        errand_name: "",
-        errand_desc: "",
-        errand_cost: "",
-        errand_photo: null,
-        status: "pending" // Default status
-    });
+    const [errand_name, setErrandName] = useState("");
+    const [errand_desc, setErrandDesc] = useState("");
+    const [errand_cost, setErrandCost] = useState("");
+    const [errand_deadline, setDeadline] = useState("");
+    const [status, setStatus] = useState("")
+    const [errand_photo, setErrandPhoto] = useState(null);
     
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState("");
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    
     const [photoPreview, setPhotoPreview] = useState(null); // State to preview image
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = localStorage.getItem("user");
 
     const checkUser = () => {
         if (!user) {
             localStorage.clear();
             navigate("/signin");
+            return false;
         }
+        return true;
     };
 
     useEffect(() => {
@@ -30,70 +34,102 @@ const CreateTask = () => {
     }, [user]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setFormData(prev => ({
-            ...prev,
-            errand_photo: file
-        }));
-        
-        // Preview image
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setPhotoPreview(reader.result);
+            const { name, value } = e.target;
+            if (name === "errand_name") setErrandName(value);
+            if (name === "errand_desc") setErrandDesc(value);
+            if (name === "errand_cost") setErrandCost(value);
+            if (name === "status") setStatus(value);
+            if (name === "deadline") setDeadline(value);
         };
-        if (file) {
-            reader.readAsDataURL(file);
-        }
-    };
+
+        const handleFileChange = (e) => {
+            const file = e.target.files[0];
+            setErrandPhoto(file)
+            
+            // Preview image
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPhotoPreview(reader.result);
+            };
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        };
 
     const submitForm = async (e) => {
         e.preventDefault();
-        if (!formData.errand_name || !formData.errand_desc || !formData.errand_cost) {
-            toast.error("Please fill in all required fields.");
-            return;
-        }
+        
+        if (!checkUser()) return;
 
         try {
-            setLoading(true);
-            
+            setError("");
+            setSuccess("");
+            setLoading("Please wait as we submit your data");
+
             const data = new FormData();
-            data.append("errand_name", formData.errand_name);
-            data.append("errand_desc", formData.errand_desc);
-            data.append("errand_cost", formData.errand_cost);
-            data.append("creator_id", user.user_id);
-            data.append("status", formData.status);
-            data.append("errand_photo", formData.errand_photo);
-           
-            const response = await axios.post(
-                "https://Muita.pythonanywhere.com/api/adderrand", 
-                data
+            data.append("errand_name", errand_name);
+            data.append("errand_desc", errand_desc);
+            data.append("errand_cost", errand_cost);
+            data.append("errand_photo", errand_photo);
+            data.append("creator_id", JSON.parse(user).id);
+            data.append("status", status || "pending") 
+            // Add if using deadline:
+            // data.append("errand_deadline", errand_deadline);
+
+            const response = await axios.post("https://Muita.pythonanywhere.com/api/adderrand"
+                , 
+                data,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
             );
             
-            toast.success(response.data.success || "Task created successfully!");
-            setFormData({
-                errand_name: "",
-                errand_desc: "",
-                errand_cost: "",
-                errand_photo: null,
-                status: "pending"
-            });
-            setPhotoPreview(null); // Clear photo preview
+            console.log(response)
+            setLoading("");
+           toast.success(response.data.success || "Errand created successfully!"); 
             
+        //    // Redirect to dashboard after successful task creation
+        //    navigate("/dash");
+
+            // Reset form
+            setErrandName("");
+            setErrandDesc("");
+            setErrandCost("");
+            setDeadline("");
+            setErrandPhoto(null);
+            // To reset file input (requires ref)
+            document.querySelector('input[type="file"]').value = "";
+
         } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to create task. Please try again.");
-            console.error("Error creating task:", error);
-        } finally {
-            setLoading(false);
+            setLoading("");
+            setError(
+                error.response?.data?.message || 
+                error.response?.data?.error || 
+                error.message
+            );
         }
     };
+
+    // const handleFileChange = (e) => {
+    //     const file = e.target.files[0];
+    //         if (file) {
+    //         // Optional: Validate file type/size
+    //         const validTypes = ["image/jpeg", "image/png", "image/gif"];
+    //         if (!validTypes.includes(file.type)) {
+    //             setError("Please upload a valid image (JPEG, PNG, GIF)");
+    //             return;
+    //         }
+    //         if (file.size > 5 * 1024 * 1024) { // 5MB
+    //             setError("File size should be less than 5MB");
+    //             return;
+    //         }
+    //         setErrandPhoto(file);
+    //         setError("");
+    //     }
+    // };
+
 
     return ( 
         <div className="container py-5">
@@ -119,7 +155,7 @@ const CreateTask = () => {
                                         placeholder="Enter task title"
                                         required
                                         className="form-control"
-                                        value={formData.errand_name}
+                                        value={errand_name}
                                         onChange={handleChange}
                                     />
                                 </div>
@@ -135,7 +171,7 @@ const CreateTask = () => {
                                         required
                                         rows="4"
                                         className="form-control"
-                                        value={formData.errand_desc}
+                                        value={errand_desc}
                                         onChange={handleChange}
                                     />
                                 </div>
@@ -155,7 +191,7 @@ const CreateTask = () => {
                                                 required
                                                 min="1"
                                                 className="form-control"
-                                                value={formData.errand_cost}
+                                                value={errand_cost}
                                                 onChange={handleChange}
                                             />
                                         </div>
@@ -169,7 +205,7 @@ const CreateTask = () => {
                                             id="status"
                                             name="status"
                                             className="form-select"
-                                            value={formData.status}
+                                            value={status}
                                             onChange={handleChange}
                                         >
                                             <option value="pending">Pending</option>

@@ -11,6 +11,8 @@ import GetErrands from './Components/GetTasks';
 import MyLocationMap from './Components/Location';
 import ContactUs from './Components/ContactUs';
 import Navbar from "./Components/Navbar"
+import TaskRunnerDashboard from './Components/TaskRunner';
+import ChatWindow from './Components/ChatWindow';
 
 
 
@@ -23,10 +25,12 @@ function App() {
       <Route path='/signup' element={<SignUp/>}/>
       <Route path='/signin' element={<SignIn/>}/>
       <Route path='/createtask' element={<CreateTask/>}/>
+      <Route path='/task' element={<TaskRunnerDashboard/>}/>
       <Route path='/' element={<Home/>}/>
       <Route path='/dash' element={<GetErrands/>}/>
       <Route path='/loc' element={<MyLocationMap/>}/>
       <Route path='/contactus' element={<ContactUs/>}/>
+      <Route path='/chat' element={<ChatWindow/>}/>
     </Routes>
       
     </div>

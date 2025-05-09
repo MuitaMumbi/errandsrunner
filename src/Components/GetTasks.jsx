@@ -10,22 +10,35 @@ const GetErrands = () => {
     const [filteredErrands, setFilteredErrands] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
 
-    const img_url = "https://Muita.pythonanywhere.com/static/";
+    const img_url = "https://Muita.pythonanywhere.com/static/images";
     const navigate = useNavigate();
 
     const getErrands = async () => {
         setError("");
-        setLoading("Loading available errands...");
-        try {
+        setLoading("Loading your errands...");
+        try {   
+            const user_id = localStorage.getItem("user_id"); // Assume it's stored as string
+            console.log("Stored user_id:", user_id);
+
+            // Make sure user_id exists before continuing
+        if (!user_id) {
+            setLoading("");
+            setError("User not logged in. Please log in to view your errands.");
+            return;
+        }
             const response = await axios.get("https://Muita.pythonanywhere.com/api/geterrands");
-            setErrands(response.data);
-            setFilteredErrands(response.data);
+            const userErrands = response.data.filter(errand => String(errand.creator_id) === String(user_id));
+            console.log("Fetched errands:", response.data);
+
+            setErrands(userErrands);
+            setFilteredErrands(userErrands);
             setLoading("");
         } catch (error) {
             setLoading("");
             setError(error.message);
         }
     };
+    
 
     const handleSearch = (value) => {
         setSearchTerm(value);
@@ -40,6 +53,10 @@ const GetErrands = () => {
         getErrands();
     }, []);
 
+    const handleCreateTask = () => {
+        navigate('/createtask');
+      };
+
     return (
         <div className="min-vh-100 bg-light">
             {/* <Navbar /> */}
@@ -49,12 +66,12 @@ const GetErrands = () => {
                 <div className="container">
                     <h1 className="display-5 fw-bold mb-3">Find Help for Your Tasks</h1>
                     <p className="lead mb-4">Connect with task runners ready to assist you</p>
-                    
+                    <button className="btn btn-warning mb-4" type="button" onClick={handleCreateTask}>Create Task</button>
                     <div className="col-lg-6 mx-auto">
                         <div className="input-group mb-3 shadow-lg">
                             <input
                                 type="text"
-                                placeholder="What do you need help with?"
+                                placeholder="Search for available tasks"
                                 className="form-control form-control-lg"
                                 value={searchTerm}
                                 onChange={(e) => handleSearch(e.target.value)}
@@ -88,7 +105,7 @@ const GetErrands = () => {
                 {!loading && !error && (
                     <>
                         <h2 className="mb-4 fw-bold">Available Errands</h2>
-                        
+                        <p className="mb-4 ">(Errands you create will show here)</p>
                         {filteredErrands.length === 0 ? (
                             <div className="text-center py-5">
                                 <i className="bi bi-inbox" style={{ fontSize: "3rem", color: "#6c757d" }}></i>

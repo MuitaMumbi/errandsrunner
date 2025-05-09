@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 
 const Home = () => {
     const navigate = useNavigate();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        const authStatus = localStorage.getItem("isAuthenticated");
+        setIsAuthenticated(authStatus === "true");
+    }, []);
 
     return ( 
         <div className="home-container">
@@ -27,9 +33,10 @@ const Home = () => {
                     <div className="cta-buttons">
                         <button 
                             className="btn btn-primary animate__animated animate__fadeInLeft"
-                            onClick={() => navigate('/signup')}
+                            onClick={() => !isAuthenticated && navigate('/signup')}
+                            disabled={isAuthenticated}
                         >
-                            Get Started
+                            {isAuthenticated ? "Already Signed In" : "Get Started"}
                         </button>
                         <button 
                             className="btn btn-outline-primary animate__animated animate__fadeInRight"
@@ -61,5 +68,5 @@ const Home = () => {
         </div>
     );
 }
- 
+
 export default Home;
