@@ -1,0 +1,31 @@
+.chat-window {
+    background-color: #f8f9fa;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .messages {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+  }
+  
+  .text-start p {
+    background-color: #e2e3e5;
+    padding: 8px;
+    border-radius: 10px;
+    display: inline-block;
+    max-width: 70%;
+  }
+  
+  .text-end p {
+    background-color: #cfe2ff;
+    padding: 8px;
+    border-radius: 10px;
+    display: inline-block;
+    max-width: 70%;
+    margin-left: auto;
+  }
+  

@@ -1,56 +1,67 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import "bootstrap-icons/font/bootstrap-icons.css"; // Make sure this is installed
+import { useNavigate } from "react-router-dom";
+
 
 const ChatWindow = ({ currentUserId, chatPartnerId }) => {
-    const [messages, setMessages] = useState([]); // Stores all the messages
-    const [newMessage, setNewMessage] = useState(""); // Stores the current message typed by the user
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState("");
+    const [location, setLocation] = useState("")
+    const navigate = useNavigate();
 
     const fetchMessages = async () => {
         try {
             const response = await axios.get(`https://Muita.pythonanywhere.com/api/messages?user1=${currentUserId}&user2=${chatPartnerId}`);
-            setMessages(response.data);// Updates the messages state with the response from the server
+            setMessages(response.data);
         } catch (err) {
-            console.error("Error fetching messages:", err); // If an error occurs, log it
-
+            console.error("Error fetching messages:", err);
         }
     };
 
     const sendMessage = async () => {
-        if (!newMessage.trim()) return;// Don't send empty messages
+        if (!newMessage.trim()) return;
         try {
             await axios.post("https://Muita.pythonanywhere.com/api/messages", {
                 sender_id: currentUserId,
                 receiver_id: chatPartnerId,
                 content: newMessage,
             });
-            setNewMessage("");// Clear the input field
-            fetchMessages(); // Refresh chat
+            setNewMessage("");
+            fetchMessages();
         } catch (err) {
             console.error("Error sending message:", err);
         }
     };
-
+    const handleCreateTask = () => {
+            navigate('/loc');
+        };
     useEffect(() => {
-        fetchMessages();// Fetch initial messages
-        const interval = setInterval(fetchMessages, 3000); // Poll the server every 3 seconds to check for new messages
-        return () => clearInterval(interval);// Clean up the interval when the component is unmounted
-    }, []);
+        fetchMessages();
+        const interval = setInterval(fetchMessages, 3000);
+        return () => clearInterval(interval);
+    }, [currentUserId, chatPartnerId]);
 
     return (
-        <div className="chat-window border rounded p-3">
-            <div className="messages mb-3" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+        <div className="chat-window border rounded p-3 mt-4 shadow-sm" style={{ maxWidth: '600px', margin: '0 auto' }}>
+            <div className="d-flex align-items-center mb-3">
+                <i className="bi bi-chat-dots-fill me-2 text-primary fs-4"></i>
+                <h5 className="mb-0">Chat with {chatPartnerId}</h5>
+            </div>
+
+            <div className="messages mb-3 bg-light rounded p-2" style={{ maxHeight: '300px', overflowY: 'auto' }}>
                 {messages.map(msg => (
-                    <div key={msg.id} className={msg.sender_id === currentUserId ? "text-end" : "text-start"}>
-                        <p className="mb-1"><strong>{msg.sender_id === currentUserId ? "You" : "Them"}:</strong> {msg.content}</p>
-                        <small className="text-muted">{new Date(msg.timestamp).toLocaleTimeString()}</small>
+                    <div key={msg.id} className={`mb-2 ${msg.sender_id === currentUserId ? "text-end" : "text-start"}`}>
+                        <div className={`d-inline-block px-3 py-2 rounded ${msg.sender_id === currentUserId ? "bg-primary text-white" : "bg-white border"}`}>
+                            <strong>{msg.sender_id === currentUserId ? "You" : "Them"}:</strong> {msg.content}
+                        </div>
+                        <div>
+                            <small className="text-muted">{new Date(msg.timestamp).toLocaleTimeString()}</small>
+                        </div>
                     </div>
-                    // If the message's sender_id matches the currentUserId, it displays the message aligned to the right (text-end class) and labels it as "You".
-
-                    // If the sender_id doesn't match the currentUserId, it displays the message aligned to the left (text-start) and labels it as "Them".
-
-                    // The timestamp is formatted into a human-readable time using toLocaleTimeString().
                 ))}
             </div>
+
             <div className="input-group">
                 <input
                     type="text"
@@ -59,7 +70,15 @@ const ChatWindow = ({ currentUserId, chatPartnerId }) => {
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                 />
-                <button className="btn btn-primary" onClick={sendMessage}>Send</button>
+                <button className="btn btn-primary" onClick={sendMessage}>
+                    <i className="bi bi-send"></i>
+                </button>
+            </div>
+
+            <div>
+                 <button className="btn btn-success mb-4" type="button" onClick={handleCreateTask}>Share Location with</button>
+
+                
             </div>
         </div>
     );

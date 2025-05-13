@@ -13,6 +13,9 @@ import ContactUs from './Components/ContactUs';
 import Navbar from "./Components/Navbar"
 import TaskRunnerDashboard from './Components/TaskRunner';
 import ChatWindow from './Components/ChatWindow';
+import ForgotPassword from './Components/ForgotPassword';
+import About from './Components/AboutUs';
+import ErrandDetails from './Components/ErrandDetails';
 
 
 
@@ -31,6 +34,9 @@ function App() {
       <Route path='/loc' element={<MyLocationMap/>}/>
       <Route path='/contactus' element={<ContactUs/>}/>
       <Route path='/chat' element={<ChatWindow/>}/>
+      <Route path='/forgot-password' element={<ForgotPassword/>}/>
+      <Route path='/about' element={<About/>}/>
+      <Route path='errand-details' element={<ErrandDetails/>}/>
     </Routes>
       
     </div>

@@ -29,6 +29,7 @@ const SignIn = () => {
             data.append("role", role);
 
             const response = await axios.post("https://Muita.pythonanywhere.com/api/signin", data);
+            console.log(response)
            
             if (response.data.user) {
                 console.log("User object:", response.data.user);
@@ -42,7 +43,7 @@ const SignIn = () => {
                 if (response.data.user.role === "Runner") {
                     navigate("/task");
                 } else if (response.data.user.role === "Creator") {
-                    navigate("/dash");
+                    navigate("/");
                 } else {
                     navigate("/"); // Default redirect (if role is unrecognized)
                 }
@@ -105,6 +106,10 @@ const SignIn = () => {
                         ) : null}
                         Sign In
                     </button>
+                    <p className="mt-2">
+                        <Link to="/forgot-password" className="text-decoration-none">Forgot Password?</Link>
+                    </p>
+
                 </form>
 
                 <p className="mt-3">

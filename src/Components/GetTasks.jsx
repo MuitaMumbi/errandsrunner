@@ -1,7 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-// import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
+import ChatWindow from "./ChatWindow";
+
 
 const GetErrands = () => {
     const [errands, setErrands] = useState([]);
@@ -10,25 +11,26 @@ const GetErrands = () => {
     const [filteredErrands, setFilteredErrands] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
 
+    const [selectedRunnerId, setSelectedRunnerId] = useState(null);
+    const [showChat, setShowChat] = useState(false);
+
     const img_url = "https://Muita.pythonanywhere.com/static/images";
     const navigate = useNavigate();
+    const userId = localStorage.getItem("user_id");
 
     const getErrands = async () => {
         setError("");
         setLoading("Loading your errands...");
-        try {   
-            const user_id = localStorage.getItem("user_id"); // Assume it's stored as string
-            console.log("Stored user_id:", user_id);
+        try {
+            if (!userId) {
+                setLoading("");
+                setError("User not logged in. Please log in to view your errands.");
+                return;
+            }
 
-            // Make sure user_id exists before continuing
-        if (!user_id) {
-            setLoading("");
-            setError("User not logged in. Please log in to view your errands.");
-            return;
-        }
-            const response = await axios.get("https://Muita.pythonanywhere.com/api/geterrands");
-            const userErrands = response.data.filter(errand => String(errand.creator_id) === String(user_id));
-            console.log("Fetched errands:", response.data);
+            const response = await axios.get(`https://Muita.pythonanywhere.com/api/geterrands?runner_id=${userId}`);
+            const data = response.data;
+            const userErrands = data.filter(errand => String(errand.creator_id) === String(userId));
 
             setErrands(userErrands);
             setFilteredErrands(userErrands);
@@ -38,7 +40,6 @@ const GetErrands = () => {
             setError(error.message);
         }
     };
-    
 
     const handleSearch = (value) => {
         setSearchTerm(value);
@@ -49,18 +50,21 @@ const GetErrands = () => {
         setFilteredErrands(filtered);
     };
 
+    const handleCreateTask = () => {
+        navigate('/createtask');
+    };
+
+    const openChatWithRunner = (runnerId) => {
+        setSelectedRunnerId(runnerId);
+        setShowChat(true);
+    };
+
     useEffect(() => {
         getErrands();
     }, []);
 
-    const handleCreateTask = () => {
-        navigate('/createtask');
-      };
-
     return (
         <div className="min-vh-100 bg-light">
-            {/* <Navbar /> */}
-            
             {/* Hero Section */}
             <div className="bg-primary text-white py-5">
                 <div className="container">
@@ -104,8 +108,8 @@ const GetErrands = () => {
 
                 {!loading && !error && (
                     <>
-                        <h2 className="mb-4 fw-bold">Available Errands</h2>
-                        <p className="mb-4 ">(Errands you create will show here)</p>
+                        <h2 className="mb-4 fw-bold">Your Created Errands</h2>
+
                         {filteredErrands.length === 0 ? (
                             <div className="text-center py-5">
                                 <i className="bi bi-inbox" style={{ fontSize: "3rem", color: "#6c757d" }}></i>
@@ -117,36 +121,31 @@ const GetErrands = () => {
                                 {filteredErrands.map((errand) => (
                                     <div className="col-md-4 col-lg-3" key={errand.id}>
                                         <div className="card h-100 shadow-sm border-0">
-                                            {/* {errand.product_photo && (
-                                                <img 
-                                                    src={img_url + errand.product_photo} 
-                                                    className="card-img-top object-fit-cover" 
-                                                    alt={errand.errand_name}
-                                                    style={{ height: "180px" }}
-                                                />
-                                            )} */}
                                             <div className="card-body d-flex flex-column">
                                                 <h5 className="card-title text-truncate">{errand.errand_name}</h5>
                                                 <p className="card-text text-muted flex-grow-1">
                                                     {errand.errand_desc.slice(0, 100)}
                                                     {errand.errand_desc.length > 100 && "..."}
                                                 </p>
-                                                <div className="d-flex justify-content-between align-items-center">
+                                                <div className="d-flex justify-content-between align-items-center mt-3">
                                                     <span className="badge bg-warning text-dark fs-6">
                                                         Ksh {errand.errand_cost}
                                                     </span>
-                                                    <button 
+                                                    <button
                                                         className="btn btn-sm btn-outline-primary"
                                                         onClick={() => navigate("/errand-details", { state: { errand } })}
                                                     >
                                                         View Details
                                                     </button>
                                                 </div>
-                                            </div>
-                                            <div className="card-footer bg-transparent border-top-0">
-                                                <small className="text-muted">
-                                                    Posted {new Date(errand.created_at).toLocaleDateString()}
-                                                </small>
+                                                {errand.runner_id && (
+                                                    <button
+                                                        className="btn btn-sm btn-outline-secondary mt-2"
+                                                        onClick={() => openChatWithRunner(errand.runner_id)}
+                                                    >
+                                                        <i className="bi bi-chat-dots me-1"></i> Message Runner
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -154,6 +153,14 @@ const GetErrands = () => {
                             </div>
                         )}
                     </>
+                )}
+
+                {/* Chat Window */}
+                {showChat && selectedRunnerId && (
+                    <div className="mt-5">
+                        <h4 className="text-primary">Chat with Runner</h4>
+                        <ChatWindow currentUserId={userId} chatPartnerId={selectedRunnerId} />
+                    </div>
                 )}
             </div>
 

@@ -6,7 +6,7 @@ const MyLocationMap = () => {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const [mapInitialized, setMapInitialized] = useState(false);
-
+  
   // Custom marker icon
   const userIcon = new L.Icon({
     iconUrl: 'https://cdn-icons-png.flaticon.com/512/64/64113.png',
@@ -25,6 +25,7 @@ const MyLocationMap = () => {
       (position) => {
         const { latitude, longitude } = position.coords;
 
+      
         if (!mapInitialized) {
           mapRef.current = L.map('map').setView([latitude, longitude], 16);
           setMapInitialized(true);
@@ -37,7 +38,7 @@ const MyLocationMap = () => {
         if (!markerRef.current) {
           markerRef.current = L.marker([latitude, longitude], { icon: userIcon })
             .addTo(mapRef.current)
-            .bindPopup("Creator's Location")
+            .bindPopup("Runner's Location")
             .openPopup();
         } else {
           markerRef.current.setLatLng([latitude, longitude]).openPopup();

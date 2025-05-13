@@ -3,63 +3,78 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "bootstrap-icons/font/bootstrap-icons.css"; // Import Bootstrap Icons
+import ChatWindow from "./ChatWindow"; // Adjust path if needed
 
 const CreateTask = () => {
     const [errand_name, setErrandName] = useState("");
     const [errand_desc, setErrandDesc] = useState("");
     const [errand_cost, setErrandCost] = useState("");
-    const [errand_deadline, setDeadline] = useState("");
-    const [status, setStatus] = useState("")
+    const [status, setStatus] = useState("");
     const [errand_photo, setErrandPhoto] = useState(null);
-    
     const [loading, setLoading] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    
-    const [photoPreview, setPhotoPreview] = useState(null); // State to preview image
+    const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
+    const [photoPreview, setPhotoPreview] = useState(null);
+    const [showChat, setShowChat] = useState(false); // 👈 Chat toggle
     const navigate = useNavigate();
-    const user = localStorage.getItem("user");
 
     const checkUser = () => {
-        if (!user) {
+        const storedUser = localStorage.getItem("user");
+
+        if (!storedUser) {
             localStorage.clear();
             navigate("/signin");
             return false;
         }
-        return true;
+
+        try {
+            const userObj = JSON.parse(storedUser);
+            setUser(userObj);
+            setToken(userObj.access_token);
+            return true;
+        } catch (e) {
+            console.error("Error parsing user from localStorage", e);
+            localStorage.clear();
+            navigate("/signin");
+            return false;
+        }
     };
 
     useEffect(() => {
         checkUser();
-    }, [user]);
+    }, []);
 
     const handleChange = (e) => {
-            const { name, value } = e.target;
-            if (name === "errand_name") setErrandName(value);
-            if (name === "errand_desc") setErrandDesc(value);
-            if (name === "errand_cost") setErrandCost(value);
-            if (name === "status") setStatus(value);
-            if (name === "deadline") setDeadline(value);
-        };
+        const { name, value } = e.target;
+        if (name === "errand_name") setErrandName(value);
+        if (name === "errand_desc") setErrandDesc(value);
+        if (name === "errand_cost") setErrandCost(value);
+        if (name === "status") setStatus(value);
+    };
 
-        const handleFileChange = (e) => {
-            const file = e.target.files[0];
-            setErrandPhoto(file)
-            
-            // Preview image
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPhotoPreview(reader.result);
-            };
-            if (file) {
-                reader.readAsDataURL(file);
-            }
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setErrandPhoto(file);
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPhotoPreview(reader.result);
         };
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    };
 
     const submitForm = async (e) => {
         e.preventDefault();
-        
-        if (!checkUser()) return;
+
+        if (!user || !token) {
+            navigate("/signin");
+            return;
+        }
 
         try {
             setError("");
@@ -71,77 +86,55 @@ const CreateTask = () => {
             data.append("errand_desc", errand_desc);
             data.append("errand_cost", errand_cost);
             data.append("errand_photo", errand_photo);
-            data.append("creator_id", JSON.parse(user).id);
-            data.append("status", status || "pending") 
-            // Add if using deadline:
-            // data.append("errand_deadline", errand_deadline);
+            data.append("creator_id", user.user_id);
+            data.append("status", "available");
 
-            const response = await axios.post("https://Muita.pythonanywhere.com/api/adderrand"
-                , 
+            const response = await axios.post(
+                "https://Muita.pythonanywhere.com/api/adderrand",
                 data,
                 {
                     headers: {
-                        "Content-Type": "multipart/form-data",
+                        "Authorization": `Bearer ${token}`,
                     },
                 }
             );
-            
-            console.log(response)
-            setLoading("");
-           toast.success(response.data.success || "Errand created successfully!"); 
-            
-        //    // Redirect to dashboard after successful task creation
-        //    navigate("/dash");
 
-            // Reset form
+            setLoading("");
+            toast.success(response.data.success || "Errand created successfully!");
+            navigate("/dash");
+
             setErrandName("");
             setErrandDesc("");
             setErrandCost("");
-            setDeadline("");
             setErrandPhoto(null);
-            // To reset file input (requires ref)
+            setPhotoPreview(null);
             document.querySelector('input[type="file"]').value = "";
-
         } catch (error) {
             setLoading("");
-            setError(
-                error.response?.data?.message || 
-                error.response?.data?.error || 
-                error.message
-            );
+            if (error.response?.status === 401) {
+                localStorage.clear();
+                navigate("/signin");
+            } else {
+                setError(
+                    error.response?.data?.message ||
+                    error.response?.data?.error ||
+                    error.message
+                );
+            }
         }
     };
 
-    // const handleFileChange = (e) => {
-    //     const file = e.target.files[0];
-    //         if (file) {
-    //         // Optional: Validate file type/size
-    //         const validTypes = ["image/jpeg", "image/png", "image/gif"];
-    //         if (!validTypes.includes(file.type)) {
-    //             setError("Please upload a valid image (JPEG, PNG, GIF)");
-    //             return;
-    //         }
-    //         if (file.size > 5 * 1024 * 1024) { // 5MB
-    //             setError("File size should be less than 5MB");
-    //             return;
-    //         }
-    //         setErrandPhoto(file);
-    //         setError("");
-    //     }
-    // };
-
-
-    return ( 
+    return (
         <div className="container py-5">
             <ToastContainer position="top-right" autoClose={5000} />
-            
+
             <div className="row justify-content-center">
                 <div className="col-lg-8">
                     <div className="card shadow">
                         <div className="card-header bg-primary text-white">
                             <h2 className="mb-0">Create New Task</h2>
                         </div>
-                        
+
                         <div className="card-body p-4">
                             <form onSubmit={submitForm}>
                                 <div className="mb-3">
@@ -159,7 +152,7 @@ const CreateTask = () => {
                                         onChange={handleChange}
                                     />
                                 </div>
-                                
+
                                 <div className="mb-3">
                                     <label htmlFor="errand_desc" className="form-label">
                                         Description <span className="text-danger">*</span>
@@ -175,7 +168,7 @@ const CreateTask = () => {
                                         onChange={handleChange}
                                     />
                                 </div>
-                                
+
                                 <div className="row">
                                     <div className="col-md-6 mb-3">
                                         <label htmlFor="errand_cost" className="form-label">
@@ -196,7 +189,7 @@ const CreateTask = () => {
                                             />
                                         </div>
                                     </div>
-                                    
+
                                     <div className="col-md-6 mb-3">
                                         <label htmlFor="status" className="form-label">
                                             Status
@@ -214,7 +207,7 @@ const CreateTask = () => {
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div className="mb-4">
                                     <label htmlFor="errand_photo" className="form-label">
                                         Task Photo (Optional)
@@ -229,11 +222,11 @@ const CreateTask = () => {
                                     />
                                     {photoPreview && (
                                         <div className="mt-2">
-                                            <img 
-                                                src={photoPreview} 
-                                                alt="Preview" 
-                                                className="img-thumbnail" 
-                                                style={{ maxHeight: "200px" }} 
+                                            <img
+                                                src={photoPreview}
+                                                alt="Preview"
+                                                className="img-thumbnail"
+                                                style={{ maxHeight: "200px" }}
                                             />
                                         </div>
                                     )}
@@ -241,10 +234,10 @@ const CreateTask = () => {
                                         Upload an image that helps describe the task (JPEG, PNG)
                                     </div>
                                 </div>
-                                
+
                                 <div className="d-grid">
-                                    <button 
-                                        type="submit" 
+                                    <button
+                                        type="submit"
                                         className="btn btn-primary btn-lg"
                                         disabled={loading}
                                     >
@@ -261,6 +254,31 @@ const CreateTask = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Chat Toggle Button */}
+            <button
+                onClick={() => setShowChat(prev => !prev)}
+                className="btn btn-light position-fixed bottom-0 end-0 m-4 rounded-circle shadow"
+                title="Chat"
+                style={{ width: "60px", height: "60px", zIndex: 1050 }}
+            >
+                <i className="bi bi-chat-dots-fill fs-4 text-primary"></i>
+            </button>
+
+            {/* Chat Window */}
+            {showChat && user && (
+                <div className="position-fixed bottom-0 end-0 m-5" style={{ width: "350px", zIndex: 1040 }}>
+                    <div className="card shadow-lg">
+                        <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <span>Chat</span>
+                            <button onClick={() => setShowChat(false)} className="btn-close btn-close-white"></button>
+                        </div>
+                        <div className="card-body p-2">
+                            <ChatWindow currentUserId={user.user_id} chatPartnerId={2} /> {/* Replace 2 with your partner ID logic */}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

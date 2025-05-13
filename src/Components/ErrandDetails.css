@@ -1,0 +1,118 @@
+/* Main container styling */
+.errand-details-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding-top: 50px;
+}
+
+/* Card styling */
+.errand-details-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin-top: 20px;
+}
+
+/* Title of the errand */
+.errand-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Description styling */
+.errand-description {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Cost badge */
+.errand-cost {
+  background-color: #ffca28;
+  color: #000;
+  font-size: 1.2rem;
+  padding: 5px 10px;
+  border-radius: 50px;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+/* Creator Info */
+.creator-info {
+  margin-top: 30px;
+  background-color: #f1f1f1;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.creator-info h5 {
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.creator-info p {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.creator-info a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.creator-info a:hover {
+  text-decoration: underline;
+}
+
+/* Footer and Back Button */
+.back-button-container {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.back-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: #0056b3;
+}
+
+.date-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* Accepted Status Styling */
+.accepted-status {
+  margin-top: 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  display: inline-block;
+}
+
+.accepted-status.accepted {
+  background-color: #28a745; /* Green for accepted */
+}
+
+.accepted-status.not-accepted {
+  background-color: #dc3545; /* Red for not accepted */
+}
+

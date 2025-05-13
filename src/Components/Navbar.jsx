@@ -3,22 +3,22 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  const navigate = useNavigate(); // Fixing the navigate usage
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.clear();
     navigate("/signin");
   };
 
-  // Check user role from the localStorage
   const isCreator = user && user.role === "Creator";
   const isRunner = user && user.role === "Runner";
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-muted ms-auto">
+    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
       <div className="container">
         <Link className="navbar-brand" to="/" id="head">
-          The Errands Runner
+          <i className="bi bi-person-running me-2 text-primary"></i>
+          THE ERRANDS RUNNER
         </Link>
         <button
           className="navbar-toggler"
@@ -30,59 +30,56 @@ const Navbar = () => {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
-            {/* Dashboard link visible for both creators and runners */}
-            <li className="nav-item">
-              <Link className="nav-link" to="/dash">
-                Dashboard
-              </Link>
-            </li>
-
-            {/* Show "Create Task" link only if the user is a creator */}
+            {isCreator && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/dash">
+                  <i className="bi bi-speedometer2 me-1"></i> Dashboard
+                </Link>
+              </li>
+            )}
             {isCreator && (
               <li className="nav-item">
                 <Link className="nav-link" to="/createtask">
-                  Create Task
+                  <i className="bi bi-plus-circle me-1"></i> Create Task
                 </Link>
               </li>
             )}
-
-            {/* Show "Available Tasks" link only if the user is a runner */}
             {isRunner && (
               <li className="nav-item">
-                <Link className="nav-link" to="/availabletasks">
-                  Available Tasks
+                <Link className="nav-link" to="/task">
+                  <i className="bi bi-list-task me-1"></i> Available Tasks
                 </Link>
               </li>
             )}
-
-            {/* Always show "Contact Us" link */}
-            <li className="nav-item">
+            {/* Optional Contact Us */}
+            {/* <li className="nav-item">
               <Link className="nav-link" to="/contactus">
-                Contact Us
+                <i className="bi bi-envelope me-1"></i> Contact Us
               </Link>
-            </li>
+            </li> */}
           </ul>
-        </div>
 
-        {/* Show user info and logout option if logged in */}
-        <div className="">
-          {user ? (
-            <div className="navbar-nav ms-auto">
-              <b className="text-dark nav-link">Hello {user.username}</b>
-              <button className="nav-link" onClick={handleLogout}>
-                Log out
-              </button>
-            </div>
-          ) : (
-            <div className="navbar-nav ms-auto">
-              <Link to="/signin" className="nav-link">
-                Login
-              </Link>
-              <Link to="/signup" className="nav-link">
-                Sign Up
-              </Link>
-            </div>
-          )}
+          <div className="d-flex align-items-center ms-auto">
+            {user ? (
+              <div className="navbar-nav d-flex align-items-center">
+                <span className="nav-link text-dark">
+                  <i className="bi bi-person-circle me-1"></i> Hello {user.username}
+                </span>
+                <button className="btn nav-link" onClick={handleLogout}>
+                  <i className="bi bi-box-arrow-right me-1"></i> Log out
+                </button>
+              </div>
+            ) : (
+              <div className="navbar-nav d-flex align-items-center">
+                <Link to="/signin" className="nav-link">
+                  <i className="bi bi-box-arrow-in-right me-1"></i> Login
+                </Link>
+                <Link to="/signup" className="nav-link">
+                  <i className="bi bi-person-plus me-1"></i> Sign Up
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </nav>
